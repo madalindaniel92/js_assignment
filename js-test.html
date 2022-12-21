@@ -507,7 +507,7 @@
                     //  <td>Message.site</td>
                     message.site,
                     //  <td>Message.user</td>
-                    message.user,
+                    message.user.name,
                     //  <td>Message preview</td>
                     previewText(message.message),
                     //  <td>Comment preview</td>
@@ -558,7 +558,7 @@
 
             renderMessage(message) {
                 this.updateField('.message-id', message.msgID);
-                this.updateField('.message-user', message.user);
+                this.updateField('.message-user', message.user.name);
                 this.updateField('.message-body', message.message);
                 this.updateField('.message-site', message.site);
                 this.updateField('.message-timestamp', formatDate(message.stamp));
