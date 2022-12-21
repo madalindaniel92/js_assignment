@@ -253,9 +253,8 @@
     <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script>
 // To isolate locally defined objects from window, we create a function scope
-// that is called once the DOM is loaded.
 //
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
         const names = ["Anna", "Benjamin", "Cartman", "Devon", "Eisa", "Filip", "Greg", "Haydyn", "Irvin", "Jacky", "Kyle", "Lee", "Markus", "Norrie", "Oscar", "Randy", "Quinn", "Stan", "Taylor", "Umma", "Vincent", "Wade Wilson", "Xin", "Zhong"],
               sites = [ "yhh", "jvl", "suv", "psp", "der", "usz" ],
               countries = [ "us", "ro", "jp", "eu", "fr", "md" ],
@@ -335,16 +334,48 @@ document.addEventListener('DOMContentLoaded', function() {
             return Math.floor(Math.random() * (upper - lower)) + lower
         }
 
+        // State management object
+        //
+        // Starts off unitialized, but will be instantiated and populated with data.
+        //
+        // This variable definition is needed here, so that the Message and User
+        // classes have access to the store from the closure
+        // (and don't need to have the store passed in as a depedency)
+        let store = {
+            // Array of User instances
+            users: [],
+            // Array of Message instances
+            messages: [],
+
+            // Index users by user id, to make retrieval by id simpler
+            //
+            // usersById has shape  { userId: string => user: object instanceof User }
+            //
+            usersById: {},
+        };
+
+        // Initialize the store with this state
+        const initializeStore = (initialState) => store = initialState;
+
+        // We use an object as default to allow nested property access.
+        const missingUser = {
+            name: 'N/A (missing user)',
+            ranking: {},
+        };
+
         class Message {
             constructor(id) {
                 this.id = id;
                 this.message = randomEntry(messages);
                 this.site = randomEntry(sites);
-                this.user = randomEntry(names);
                 this.msgID = randomID(7);
                 this.stamp = randomDate().getTime();
                 this.comment = randomEntry(messages);
                 this.error = randomBool( 0.1 ) ? [`{\"error\":\"Forbidden\",\"data\":[],\"serverTime\":\"${randomDate().toISOString()}\"}`] : null;
+            }
+
+            get user() {
+                return store.usersById[this.id] || missingUser
             }
         }
 
@@ -370,24 +401,6 @@ document.addEventListener('DOMContentLoaded', function() {
         //
         // Only exception to this rule is using Bootstrap Modals.
         //
-
-        // Modal for displaying message information.
-        const modalElement = document.getElementById('messageModal');
-        if (!modalElement) {
-            throw new Error('missing modal from HTML template')
-        }
-
-        const tables = document.getElementsByClassName('sample-table');
-        if (tables.length === 0) {
-            throw new Error('missing tables from HTML template')
-        }
-
-        const rowInfoModal = new bootstrap.Modal(modalElement, {
-            keyboard: true,
-            focus: true,
-        });
-
-
         // Constants
         const NUM_USERS_LOWER = 5;  // lower limit for number of users
         const NUM_USERS_UPPER = 20; // upper limit for number of users
@@ -397,182 +410,200 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const USER_ID_LENGTH = 7;
 
-        // Index users by user id, to make retrieval by id simpler
-        //
-        // usersById has shape  { userId: string => user: object instanceof User }
-        //
-        let usersById = {};
+        // Helper function to create an Array of size `length` using a closure
+        const repeat = (length, createValue) => {
+            // We use Array(length).fill(value), to create an array of `numMessages` length
+            // / over which we can map.
+            return Array(length).fill(null).map(createValue)
+        }
 
-        // Index messages by user id, to make retrieval of message simpler
-        //
-        // messagesByUserId has shape  { userId: string => messages: Array[message],
-        //                                            where message: object instanceof Message }
-        //
-        let messagesByUserId = {};
 
-        // We use an object as default to allow nested property access.
-        const missingUser = {
-            name: 'N/A (missing user)',
-            ranking: {},
-        };
+        // Generate users and messages, return a `store` object with application state.
+        function populateUsersAndMessages() {
+            const numUsers = randomInt(NUM_USERS_LOWER, NUM_USERS_UPPER);
+            let messages = [];
+            let usersById = {};
 
-        // Generate users and messages
-        const numUsers = randomInt(NUM_USERS_LOWER, NUM_USERS_UPPER);
-        let users = [];
-        let messageEntries = [];
+            // Generate users
+            let users = repeat(numUsers, () => {
+                let userId = randomID(USER_ID_LENGTH);
+                let user = new User(userId);
+                usersById[userId] = user;
 
-        // Generate users
-        for (let i = 0; i < numUsers; i++) {
-            let userId = randomID(USER_ID_LENGTH);
-            let user = new User(userId);
-            users.push(user);
-            usersById[userId] = user;
+                const numMessages = randomInt(NUM_MESSAGES_PER_USER_LOWER,
+                                              NUM_MESSAGES_PER_USER_UPPER);
 
-            // Generate user messages
-            const numMessages = randomInt(NUM_MESSAGES_PER_USER_LOWER,
-                                          NUM_MESSAGES_PER_USER_UPPER);
-            let userMessages = [];
 
-            for (let j = 0; j < numMessages; j++) {
-                let message = new Message(userId);
+                // Generate user messages
+                let userMessages = repeat(numMessages, () => new Message(userId));
+                messages = messages.concat(userMessages)
 
-                // Push message both in global `messageEntries` array,
-                // as well as in (per userId) userMessages array.
-                messageEntries.push(message);
-                userMessages.push(message);
-            }
+                return user
+            })
 
-            messagesByUserId[userId] = userMessages;
+            return { users, messages, usersById };
         }
 
         // DOM Rendering
-        function renderTable(table) {
-            if (!table) {
-                throw new Error('missing user table in HTML template');
+
+        class TableRenderer {
+            constructor({ store, modalRenderer }) {
+                this.store = store;
+                this.modalRenderer = modalRenderer
             }
 
-            table.appendChild(renderTableBody())
-        }
-
-        // Render tables
-        Array.from(tables).forEach(renderTable);
-
-        // renderTableBody returns a new DOM fragment with the following format
-        //
-        // <tbody>
-        //   <!-- For each message in messageEntries, renderTableRow(message) -->
-        // </tbody>
-        function renderTableBody() {
-            let tBody = document.createElement('tbody');
-
-            messageEntries.map(renderTableRow).forEach((tr) => {
-                tBody.appendChild(tr);
-            });
-
-            return tBody;
-        }
-
-        // renderTableRow returns a new DOM fragment with the following format
-        //
-        //   <tr>
-        //      <td>Message.date</td>
-        //      <td>User.name</td>
-        //      <td>User.ranking.level</td>
-        //      <td>Message.site</td>
-        //      <td>Message.user</td>
-        //      <td>Message preview</td>
-        //      <td>Comment preview</td>
-         //     <td>Message.errors</td>
-        //    </tr>
-        function renderTableRow(message) {
-            let tr = document.createElement('tr');
-            let userId = message.id;
-
-            // Get user (or use placeholder missingUser)
-            let user = usersById[userId] || missingUser;
-
-            // Append TD children
-            appendTdChildren(tr, [
-                //  <td>Message.date</td>
-                formatDate(message.stamp),
-                //  <td>User.name</td>
-                user.name,
-                //  <td class="user-ranking">User.ranking.level</td>
-                user.ranking.level,
-                //  <td>Message.site</td>
-                message.site,
-                //  <td>Message.user</td>
-                message.user,
-                //  <td>Message preview</td>
-                previewText(message.message),
-                //  <td>Comment preview</td>
-                previewText(message.comment),
-                //  <td>Message.errors</td>
-                renderMessageErrors(message.error),
-            ]);
-
-            // Show modal on click
-            tr.addEventListener('click', function() {
-                renderModalContentForMessage(message)
-                rowInfoModal.show();
-            });
-
-            return tr;
-        }
-
-        function appendTdChildren(container, textItems) {
-            textItems
-                .map(renderTd)
-                .forEach((td) => {
-                    container.appendChild(td);
+            render(tables) {
+                Array.from(tables).forEach((table) => {
+                    this.renderTable(table);
                 });
+            }
+
+            renderTable(table) {
+                table.appendChild(this.renderTableBody());
+            }
+
+            // renderTableBody returns a new DOM fragment with the following format
+            //
+            // <tbody>
+            //   <!-- For each message in messageEntries, renderTableRow(message) -->
+            // </tbody>
+            renderTableBody() {
+                let tBody = document.createElement('tbody');
+
+                this.store.messages
+                    .map((message) => this.renderTableRow(message))
+                    .forEach((tr) => {
+                        tBody.appendChild(tr);
+                    });
+
+                return tBody;
+            }
+
+            // renderTableRow returns a new DOM fragment with the following format
+            //
+            //   <tr>
+            //      <td>Message.date</td>
+            //      <td>User.name</td>
+            //      <td>User.ranking.level</td>
+            //      <td>Message.site</td>
+            //      <td>Message.user</td>
+            //      <td>Message preview</td>
+            //      <td>Comment preview</td>
+            //     <td>Message.errors</td>
+            //    </tr>
+            renderTableRow(message) {
+                let tr = document.createElement('tr');
+                let userId = message.id;
+                let user = message.user;
+
+                // Append TD children
+                this.appendTdChildren(tr, [
+                    //  <td>Message.date</td>
+                    formatDate(message.stamp),
+                    //  <td>User.name</td>
+                    user.name,
+                    //  <td class="user-ranking">User.ranking.level</td>
+                    user.ranking.level,
+                    //  <td>Message.site</td>
+                    message.site,
+                    //  <td>Message.user</td>
+                    message.user,
+                    //  <td>Message preview</td>
+                    previewText(message.message),
+                    //  <td>Comment preview</td>
+                    previewText(message.comment),
+                    //  <td>Message.errors</td>
+                    renderMessageErrors(message.error),
+                ]);
+
+                // Show modal on click
+                tr.addEventListener('click', () => {
+                    this.modalRenderer.render(message)
+                    this.modalRenderer.show()
+                });
+
+                return tr;
+            }
+
+            // Append all <td> children to <tr>
+            appendTdChildren(container, textItems) {
+                textItems
+                    .map((text) => this.renderTd(text))
+                    .forEach((td) => {
+                        container.appendChild(td);
+                    });
+            }
+
+            // Render a <td> with given text
+            renderTd(text) {
+                let td = document.createElement('td');
+                td.textContent = text;
+                return td;
+            }
         }
 
-        function renderTd(text) {
-            let td = document.createElement('td');
-            td.textContent = text;
-            return td;
+        class ModalRenderer {
+            constructor(modalElement) {
+                this.modalElement = modalElement
+                this.bsModal = new bootstrap.Modal(modalElement, {
+                    keyboard: true,
+                    focus: true,
+                });
+            }
+
+            render(message) {
+                this.renderMessage(message);
+                this.renderUser(message.user);
+            }
+
+            renderMessage(message) {
+                this.updateField('.message-id', message.msgID);
+                this.updateField('.message-user', message.user);
+                this.updateField('.message-body', message.message);
+                this.updateField('.message-site', message.site);
+                this.updateField('.message-timestamp', formatDate(message.stamp));
+
+                this.updateField('.message-comment', message.comment);
+                this.updateField('.message-error', renderMessageErrors(message.error));
+
+            }
+
+            renderUser(user) {
+                let ranking = user.ranking || {}
+
+                this.updateField('.user-name', user.id)
+                this.updateField('.user-name', user.name)
+                this.updateField('.user-gold', user.isGold)
+                this.updateField('.user-country', user.country);
+                this.updateField('.user-points', user.ranking.points);
+                this.updateField('.user-timestamp', formatDate(user.stamp));
+                this.updateImgSrc('.user-avatar', user.url)
+
+                this.updateField('.user-points', user.points);
+                this.updateField('.user-ranking-league', ranking.league);
+                this.updateField('.user-ranking-level', ranking.level);
+            }
+
+            show() {
+                this.bsModal.show()
+            }
+
+            updateField(selector, textContent) {
+                let elem = this.modalElement.querySelector(selector)
+                if (!elem) { return }
+
+                elem.textContent = textContent;
+            }
+
+            updateImgSrc(selector, src) {
+                let elem = this.modalElement.querySelector(selector)
+                if (!elem) { return }
+
+                elem.setAttribute('src', src)
+            }
         }
 
-        function renderModalContentForMessage(message) {
-            let user = usersById[message.id] || missingUser;
-            let ranking = user.ranking || {}
-
-            updateField(modalElement, '.message-id', message.msgID);
-            updateField(modalElement, '.message-user', message.user);
-            updateField(modalElement, '.message-body', message.message);
-            updateField(modalElement, '.message-site', message.site);
-            updateField(modalElement, '.message-timestamp', formatDate(message.stamp));
-
-            updateField(modalElement, '.message-comment', message.comment);
-            updateField(modalElement, '.message-error', renderMessageErrors(message.error));
-
-            updateField(modalElement, '.user-name', user.id)
-            updateField(modalElement, '.user-name', user.name)
-            updateField(modalElement, '.user-gold', user.isGold)
-            updateField(modalElement, '.user-country', user.country);
-            updateField(modalElement, '.user-points', user.ranking.points);
-            updateField(modalElement, '.user-timestamp', formatDate(user.stamp));
-            updateImgSrc(modalElement, '.user-avatar', user.url)
-
-            updateField(modalElement, '.user-points', user.points);
-            updateField(modalElement, '.user-ranking-league', ranking.league);
-            updateField(modalElement, '.user-ranking-level', ranking.level);
-        }
-
-        function updateField(container, selector, textContent) {
-            let elem = container.querySelector(selector)
-            if (!elem) { return }
-
-            elem.textContent = textContent;
-        }
-
-        function updateImgSrc(container, selector, src) {
-            let elem = container.querySelector(selector)
-            if (!elem) { return }
-
-            elem.setAttribute('src', src)
-        }
+        // Helper functions
 
         function renderMessageErrors(error) {
             // Only show first error inside the table.
@@ -642,6 +673,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 return 'Invalid date'
             }
         }
-});
+
+    // Setup DOM interaction
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal for displaying message information.
+        const modalElement = document.getElementById('messageModal');
+        if (!modalElement) {
+            throw new Error('missing modal from HTML template');
+        }
+
+        // Tables for displaying user messages
+        const tables = document.getElementsByClassName('sample-table');
+        if (tables.length === 0) {
+            throw new Error('missing tables from HTML template');
+        }
+
+        // Generate data and populate the store.
+        initializeStore(populateUsersAndMessages())
+
+        let modalRenderer = new ModalRenderer(modalElement);
+        let renderer = new TableRenderer({ store, modalRenderer });
+        renderer.render(tables)
+    });
+}());
     </script>
 </html>
