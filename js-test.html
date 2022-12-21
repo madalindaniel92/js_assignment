@@ -1,0 +1,655 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <!-- used for language tabs -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+        <style>
+            .text-b {
+                width: 70%;
+                margin:auto;
+                font-family: sans-serif;
+                font-size: 18px;
+                margin-top:40px;
+            }
+            .sample-table {
+                border-collapse: collapse;
+                margin: 25px 0;
+                font-size: 0.9em;
+                min-width: 400px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            }
+            .sample-table thead tr {
+                background-color: #009879;
+                color: #ffffff;
+                text-align: left;
+
+            }
+            .sample-table th {
+                padding: 12px 15px;
+                border: .5px solid;
+            }
+
+            /*
+                Some extra styles added for the assignment
+
+                While I'm pretty good at Javascript,
+                I'm not good with CSS at all.
+
+                I usually work together with a designer that handles CSS styling,
+                while I implement the logic.
+            */
+        </style>
+    </head>
+
+    <body>
+
+        <ul class="nav nav-tabs justify-content-center" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-target="#pills-ro" data-bs-toggle="pill" role="tab" aria-controls="pills-ro" aria-selected="true">
+                    <img src="https://flagcdn.com/16x12/ro.png"
+                    width="20"
+                    height="15"
+                    alt="Romanian">
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-eg" role="tab" aria-controls="pills-eg" aria-selected="false">
+                    <img src="https://flagcdn.com/16x12/us.png"
+                    width="20"
+                    height="15"
+                    alt="English">
+                </button>
+            </li>
+        </ul>
+
+
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-ro" role="tabpanel" aria-labelledby="pills-ro-tab">
+                <div class="text-b">
+                    Am nevoie de un tabel care sa contina date din doua array-uri de obiecte.<br/>
+                    Un array contine userii, iar al doilea contine mesajele. Mesajele sunt asociate cu fiecare user prin key-ul "id"
+                    al obiectelor.<br/>
+                    In acest fisier gasesti doua clase care genereaza automat aceste obiecte in formatul cerut.<br/>
+                    Genereaza un numar random de useri si cateva mesaje asociate fiecaruia folosind clasele ajutatoare sau orice alta metoda
+                    alegi. Doar formatul obiectelor trebuie sa ramana acelasi.
+                    <br/>
+                    Pentru tabel iti recomand sa folosesti tehnologiile comentate din head.
+                    <hr/>
+
+                    Creeaza tabelul pentru mesaje: <br/>
+                    <table class="sample-table table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Message.date</th>
+                                <th>User.name</th>
+                                <th>Ranking</th>
+                                <th>Message.site</th>
+                                <th>Message.user</th>
+                                <th>Message preview</th>
+                                <th>Comment preview</th>
+                                <th>Message.errors</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <hr/>
+                    Functionalitate table row onclick: <br/>
+                    Afiseaza un usercard cu datele complete ale mesajului si ale userului asociat.
+                    <hr/>
+                    Poti modifica codul primit oricum doresti.<br/>
+                    Poti adauga orice librarii de css sau javascript, frameworks, etc..<hr/>
+                    Rezultatul trebuie trimis tot in format .html
+                    <br />
+                    <a href="./js-test.html" download >Dowload file</a>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="pills-eg" role="tabpanel" aria-labelledby="pills-eg-tab">
+                <div class="text-b">
+                    We need to generate a table that contains data from two arrays of objects.<br/>
+                    One array contains users and the second one contains messages. The messages are associated to each user via the "id" key
+                    of the objects.<br/>
+                    In this file you will find two classes that automatically generate these objects in the required format.<br/>
+                    Please generate a random number of users and some messages associated to each user using the helper classes included or any other metod you
+                    choose. Only the format of the objects needs to remain the same.
+                    <br/>
+                    For the table, we recommend using the technologies commented in the head tag.
+                    <hr/>
+
+                    Create the table for the messages: <br/>
+                    <table class="sample-table table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Message.date</th>
+                                <th>User.name</th>
+                                <th class="user-ranking">User.ranking.level</th>
+                                <th>Message.site</th>
+                                <th>Message.user</th>
+                                <th>Message preview</th>
+                                <th>Comment preview</th>
+                                <th>Message.errors</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <hr/>
+                    Table row onclick functionality: <br/>
+                    Display an usercard with all the data of the message and associated user.
+                    <hr/>
+                    You can modify this code as you see fit.<br/>
+                    You can add any other css or javascript library, framework etc.<hr/>
+                    Please send the end result in .html format.
+                    <br />
+                    <a href="./js-test.html" download >Dowload file</a>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    <!-- Modal added for assignment -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Message title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Message info -->
+                        <div class="mb-3">
+                            <label class="fw-bold">Message ID</label>
+                            <p class="message-id"></p>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message User</label>
+                            <p class="message-user"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message Body</label>
+                            <p class="message-body"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message Site</label>
+                            <p class="message-site"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message Timestamp</label>
+                            <p class="message-timestamp"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message Comment</label>
+                            <p class="message-comment"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">Message Error</label>
+                            <p class="message-error"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    <!-- User info -->
+                        <div class="mb-3">
+                            <label class="fw-bold">User ID</label>
+                            <p class="user-id"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User name</label>
+                            <p class="user-name"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User avatar</label>
+                            <img src="" class="user-avatar">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User country</label>
+                            <p class="user-country"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User points</label>
+                            <p class="user-points"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User gold</label>
+                            <p class="user-gold"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User timestamp</label>
+                            <p class="user-timestamp"></p>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User ranking league</label>
+                            <p class="user-ranking-league"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold">User ranking level</label>
+                            <p class="user-ranking-level"></p>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </body>
+    <!-- used for language tabs and modal -->
+    <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+// To isolate locally defined objects from window, we create a function scope
+// that is called once the DOM is loaded.
+//
+document.addEventListener('DOMContentLoaded', function() {
+        const names = ["Anna", "Benjamin", "Cartman", "Devon", "Eisa", "Filip", "Greg", "Haydyn", "Irvin", "Jacky", "Kyle", "Lee", "Markus", "Norrie", "Oscar", "Randy", "Quinn", "Stan", "Taylor", "Umma", "Vincent", "Wade Wilson", "Xin", "Zhong"],
+              sites = [ "yhh", "jvl", "suv", "psp", "der", "usz" ],
+              countries = [ "us", "ro", "jp", "eu", "fr", "md" ],
+              leagues = [ "silver", "gold", "diamond", "legend"],
+              messages = [
+                "Discovering new ways of making you wait.",
+                "Your time is very important to us. Please wait while we ignore you.",
+                "Still faster than Windows update.",
+                "We are not liable for any broken screens as a result of waiting.",
+                "Bored of slow loading spinner?, buy more RAM!",
+                "Kindly hold on until I finish a cup of coffee.",
+                "We will be back in 1/0 minutes.",
+                "Why don't you order a sandwich?",
+                "Don't panic, Just count to infinite.",
+                "Please wait, Your PC is not a superman!",
+                "Counting backwards from Infinity",
+                "Don't worry - a few bits tried to escape, but we caught them",
+                "The server is powered by a lemon and two electrodes.",
+                "We're testing your patience",
+                "As if you had any other choice",
+                "Follow the white rabbit",
+                "It's not you. It's me.",
+                "Creating time-loop inversion field",
+                "Don't break your screen yet!<br/>I swear it's almost done.",
+                "Unicorns are at the end of this road, I promise.",
+                "Time flies when you're having fun.",
+                "Get some coffee and come back in ten minutes..",
+                "Convincing AI not to turn evil..",
+                "Java developers never RIP. They just get Garbage Collected.",
+                "Cracking military-grade encryption...",
+                "BRB, working on my side project",
+                "Chuck Norris once urinated in a semi truck's gas tank as a joke....that truck is now known as Optimus Prime.",
+                "Chuck Norris doesn't wear a watch. HE decides what time it is.",
+                "Mining some bitcoins...",
+                "Downloading more RAM..",
+                "Never let a computer know you're in a hurry.",
+                "Deleting all your hidden porn...",
+                "Still faster than Windows update",
+                "Please wait while we serve other customers...",
+                "Our premium plan is faster",
+            ];
+
+        function randomID( length ) {
+            let result = "";
+            const characters = "0123456789";
+            const charactersLength = characters.length;
+            for ( let i = 0; i < length; ++i )
+                result += characters.charAt( Math.floor( Math.random() * charactersLength ) );
+
+            return parseFloat(result);
+        }
+
+        function randomDate() {
+            // NOTE: this code throws errors in my version of Firefox!
+            // const start = new Date( "10-10-2018 23:45" ),
+            //       end = new Date( "12-07-2022 00:10" );
+
+            // Updated the date format, so it doesn't throw invalid date errors
+            const start = new Date('2018-10-10T23:45:00');
+            const end = new Date('2022-07-12T00:10:00');
+
+            const diff =  end.getTime() - start.getTime();
+            const new_diff = diff * Math.random();
+            return new Date( start.getTime() + new_diff )
+        }
+
+        function randomBool( chance ) {
+            return ( Math.random() < chance )
+        }
+
+        function randomEntry( array ) {
+            return array[ Math.floor( Math.random() * array.length ) ]
+        }
+
+        // Extra Helpers
+        function randomInt(lower, upper) {
+            return Math.floor(Math.random() * (upper - lower)) + lower
+        }
+
+        class Message {
+            constructor(id) {
+                this.id = id;
+                this.message = randomEntry(messages);
+                this.site = randomEntry(sites);
+                this.user = randomEntry(names);
+                this.msgID = randomID(7);
+                this.stamp = randomDate().getTime();
+                this.comment = randomEntry(messages);
+                this.error = randomBool( 0.1 ) ? [`{\"error\":\"Forbidden\",\"data\":[],\"serverTime\":\"${randomDate().toISOString()}\"}`] : null;
+            }
+        }
+
+        class User {
+            constructor(id) {
+                this.id = id;
+                this.url = `https://picsum.photos/100/100?random=${ parseInt( ( Math.random() * 250 ) + 1 ) }`;
+                this.country = randomEntry(countries);
+                this.points = parseInt( Math.random() * 100000 );
+                this.isGold = randomBool( 0.5 );
+                this.stamp = randomDate().getTime();
+                this.ranking = {
+                    league: randomEntry(leagues),
+                    level: parseInt( ( Math.random() * 100 ) + 1 )
+                }
+                this.name = names[ Math.floor( Math.random() * names.length ) ];
+            }
+        }
+
+
+        // Assignment implementation code starts here
+        // pure JS solution, without using any external libraries.
+        //
+        // Only exception to this rule is using Bootstrap Modals.
+        //
+
+        // Modal for displaying message information.
+        const modalElement = document.getElementById('messageModal');
+        if (!modalElement) {
+            throw new Error('missing modal from HTML template')
+        }
+
+        const tables = document.getElementsByClassName('sample-table');
+        if (tables.length === 0) {
+            throw new Error('missing tables from HTML template')
+        }
+
+        const rowInfoModal = new bootstrap.Modal(modalElement, {
+            keyboard: true,
+            focus: true,
+        });
+
+
+        // Constants
+        const NUM_USERS_LOWER = 5;  // lower limit for number of users
+        const NUM_USERS_UPPER = 20; // upper limit for number of users
+
+        const NUM_MESSAGES_PER_USER_LOWER = 3;  // lower limit for number of mesages
+        const NUM_MESSAGES_PER_USER_UPPER = 3;  // upper limit for number of mesages
+
+        const USER_ID_LENGTH = 7;
+
+        // Index users by user id, to make retrieval by id simpler
+        //
+        // usersById has shape  { userId: string => user: object instanceof User }
+        //
+        let usersById = {};
+
+        // Index messages by user id, to make retrieval of message simpler
+        //
+        // messagesByUserId has shape  { userId: string => messages: Array[message],
+        //                                            where message: object instanceof Message }
+        //
+        let messagesByUserId = {};
+
+        // We use an object as default to allow nested property access.
+        const missingUser = {
+            name: 'N/A (missing user)',
+            ranking: {},
+        };
+
+        // Generate users and messages
+        const numUsers = randomInt(NUM_USERS_LOWER, NUM_USERS_UPPER);
+        let users = [];
+        let messageEntries = [];
+
+        // Generate users
+        for (let i = 0; i < numUsers; i++) {
+            let userId = randomID(USER_ID_LENGTH);
+            let user = new User(userId);
+            users.push(user);
+            usersById[userId] = user;
+
+            // Generate user messages
+            const numMessages = randomInt(NUM_MESSAGES_PER_USER_LOWER,
+                                          NUM_MESSAGES_PER_USER_UPPER);
+            let userMessages = [];
+
+            for (let j = 0; j < numMessages; j++) {
+                let message = new Message(userId);
+
+                // Push message both in global `messageEntries` array,
+                // as well as in (per userId) userMessages array.
+                messageEntries.push(message);
+                userMessages.push(message);
+            }
+
+            messagesByUserId[userId] = userMessages;
+        }
+
+        // DOM Rendering
+        function renderTable(table) {
+            if (!table) {
+                throw new Error('missing user table in HTML template');
+            }
+
+            table.appendChild(renderTableBody())
+        }
+
+        // Render tables
+        for (let i = 0; i < tables.length; i++) {
+            renderTable(tables[i]);
+        }
+
+        // renderTableBody returns a new DOM fragment with the following format
+        //
+        // <tbody>
+        //   <!-- For each message in messageEntries, renderTableRow(message) -->
+        // </tbody>
+        function renderTableBody() {
+            let tBody = document.createElement('tbody');
+
+            for (let i = 0; i < messageEntries.length; i++) {
+                let message = messageEntries[i];
+
+                // Render and append row to table body
+                tBody.appendChild(renderTableRow(message));
+            }
+
+            return tBody;
+        }
+
+        // renderTableRow returns a new DOM fragment with the following format
+        //
+        //   <tr>
+        //      <td>Message.date</td>
+        //      <td>User.name</td>
+        //      <td>User.ranking.level</td>
+        //      <td>Message.site</td>
+        //      <td>Message.user</td>
+        //      <td>Message preview</td>
+        //      <td>Comment preview</td>
+         //     <td>Message.errors</td>
+        //    </tr>
+        function renderTableRow(message) {
+            let tr = document.createElement('tr');
+            let userId = message.id;
+
+            // Get user (or use placeholder missingUser)
+            let user = usersById[userId] || missingUser;
+
+            // Append TD children
+            appendTdChildren(tr, [
+                //  <td>Message.date</td>
+                formatDate(message.stamp),
+                //  <td>User.name</td>
+                user.name,
+                //  <td class="user-ranking">User.ranking.level</td>
+                user.ranking.level,
+                //  <td>Message.site</td>
+                message.site,
+                //  <td>Message.user</td>
+                message.user,
+                //  <td>Message preview</td>
+                previewText(message.message),
+                //  <td>Comment preview</td>
+                previewText(message.comment),
+                //  <td>Message.errors</td>
+                renderMessageErrors(message.error),
+            ]);
+
+            // Show modal on click
+            tr.addEventListener('click', function() {
+                renderModalContentForMessage(message)
+                rowInfoModal.show();
+            });
+
+            return tr;
+        }
+
+        function appendTdChildren(container, textItems) {
+            for (let i = 0; i < textItems.length; i++) {
+                container.appendChild(renderTd(textItems[i]));
+            }
+        }
+
+        function renderTd(text, classNames) {
+            let td = document.createElement('td');
+            td.textContent = text;
+
+            if (classNames && classNames.length > 0) {
+                td.setAttribute('class', classNames.join(' '));
+            }
+
+            return td;
+        }
+
+        function renderModalContentForMessage(message) {
+            let user = usersById[message.id] || missingUser;
+            let ranking = user.ranking || {}
+
+            updateField(modalElement, '.message-id', message.msgID);
+            updateField(modalElement, '.message-user', message.user);
+            updateField(modalElement, '.message-body', message.message);
+            updateField(modalElement, '.message-site', message.site);
+            updateField(modalElement, '.message-timestamp', formatDate(message.stamp));
+
+            updateField(modalElement, '.message-comment', message.comment);
+            updateField(modalElement, '.message-error', renderMessageErrors(message.error));
+
+            updateField(modalElement, '.user-name', user.id)
+            updateField(modalElement, '.user-name', user.name)
+            updateField(modalElement, '.user-gold', user.isGold)
+            updateField(modalElement, '.user-country', user.country);
+            updateField(modalElement, '.user-points', user.ranking.points);
+            updateField(modalElement, '.user-timestamp', formatDate(user.stamp));
+            updateImgSrc(modalElement, '.user-avatar', user.url)
+
+            updateField(modalElement, '.user-points', user.points);
+            updateField(modalElement, '.user-ranking-league', ranking.league);
+            updateField(modalElement, '.user-ranking-level', ranking.level);
+        }
+
+        function updateField(container, selector, textContent) {
+            let elem = container.querySelector(selector)
+            if (!elem) { return }
+
+            elem.textContent = textContent;
+        }
+
+        function updateImgSrc(container, selector, src) {
+            let elem = container.querySelector(selector)
+            if (!elem) { return }
+
+            elem.setAttribute('src', src)
+        }
+
+        function renderMessageErrors(error) {
+            // Only show first error inside the table.
+            if (Array.isArray(error)) {
+                error = error[0]
+            }
+
+            return renderMessageError(error)
+        }
+
+        function renderMessageError(errorText) {
+            // We expect the errorText to be a JSON encoded string
+            if (typeof errorText !== 'string') { return ''; }
+            if (!errorText) { return ''; }
+
+            // Since we need to parse JSON,
+            // using try / catch is safer, as the errorText migth be invalid.
+            try {
+                let msg = JSON.parse(errorText);
+                let text = msg.error || '';
+
+                if (msg.serverTime) {
+                    // Or, using template strings
+                    //
+                    // text = `${text} (at ${ formatDate(msg.serverTime) })`
+                    //
+                    text += ' ( at ' + formatDate(msg.serverTime) + ')';
+                }
+
+                return text;
+
+            } catch {
+                return 'Invalid error format';
+            }
+        }
+
+        function previewText(text) {
+            if (!text) { text = ''; }
+
+            if (text.length > 10) {
+                return text.slice(0, 10) + '...'
+            } else {
+                return text
+            }
+        }
+
+
+        // formatDate will accept a date, either as a number of milliseconds
+        // since UNIX epoch (returned by getTime), a string representing a date,
+        // or a date object.
+        //
+        // In case we fail to format the date, we return 'Invalid date'
+        function formatDate(date) {
+            try {
+                if (typeof date === 'number') {
+                    let millis = date;
+                    date = new Date()
+                    date.setTime(millis);
+                } else if (typeof date === 'string') {
+                    date = new Date(date);
+                }
+
+                if (!date) { return 'N/A' }
+
+                return date.toDateString()
+            } catch {
+                return 'Invalid date'
+            }
+        }
+});
+    </script>
+</html>
