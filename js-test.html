@@ -455,9 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Render tables
-        for (let i = 0; i < tables.length; i++) {
-            renderTable(tables[i]);
-        }
+        Array.from(tables).forEach(renderTable);
 
         // renderTableBody returns a new DOM fragment with the following format
         //
@@ -467,12 +465,9 @@ document.addEventListener('DOMContentLoaded', function() {
         function renderTableBody() {
             let tBody = document.createElement('tbody');
 
-            for (let i = 0; i < messageEntries.length; i++) {
-                let message = messageEntries[i];
-
-                // Render and append row to table body
-                tBody.appendChild(renderTableRow(message));
-            }
+            messageEntries.map(renderTableRow).forEach((tr) => {
+                tBody.appendChild(tr);
+            });
 
             return tBody;
         }
@@ -526,19 +521,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function appendTdChildren(container, textItems) {
-            for (let i = 0; i < textItems.length; i++) {
-                container.appendChild(renderTd(textItems[i]));
-            }
+            textItems
+                .map(renderTd)
+                .forEach((td) => {
+                    container.appendChild(td);
+                });
         }
 
-        function renderTd(text, classNames) {
+        function renderTd(text) {
             let td = document.createElement('td');
             td.textContent = text;
-
-            if (classNames && classNames.length > 0) {
-                td.setAttribute('class', classNames.join(' '));
-            }
-
             return td;
         }
 
