@@ -1,4 +1,4 @@
-# JS Software Developer Assignment from Quasdev
+# JS Software Developer Assignment
 
 We need to generate a table that contains data from two arrays of objects.
 
